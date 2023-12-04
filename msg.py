@@ -2,10 +2,62 @@
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
-from pywebio.session import run_async, run_js
+from pywebio.session import *
 import asyncio
-chat_msgs = []  # Массив для хранения сообщений чата
+chat = []  # Массив для хранения сообщений чата
 online_users = set()  # Задаем список онлайн пользователей
-MAX_MESSAGES_COUNT = 100  # Ограничение для количества сообщений в чате
+MAX_MSG = 500  # Ограничение для количества сообщений в чате
 
-print('тест')
+async def main():
+    global chat
+    
+    msg = output()
+    put_scrollable(msg, height=500, keep_bottom=True)
+
+    login = await input("Войти", required=True)
+    online_users.add(login)
+
+    chat.append(( f'`{login}` войти в чат'))
+    msg.append(put_markdown(f'`{login}` войти в чат'))
+
+    refresh_task = run_async(refresh_msg(login, msg))
+
+    while True:
+        data = await input_group('Новое сообщение', [
+            input(placeholder='Текст ...', name="msg"),
+            actions(name="cmd", buttons=["Отправить", {'label': "Выйти из чата", 'type': 'cancel'}])
+        ], validate = lambda m: ('msg', 'Введите') if m["cmd"] == "Отправить" and not m['msg'] else None)
+
+        if data is None:
+            break
+
+        msg.append(put_markdown(f"`{login}`: {data['msg']}"))
+        chat.append((login, data['msg']))
+
+    refresh_task.close()
+
+    online_users.remove(login)
+    toast('Вышли')
+    msg.append(put_markdown(f'`{login}` вышел'))
+    chat.append(( f'`{login}`вышел'))
+
+    put_buttons(['Зайти с нова'], onclick=lambda btn:run_js('window.location.reload()'))
+
+async def refresh_msg(login, msg):
+    global chat
+    last_idx = len(chat)
+
+    while True:
+        await asyncio.sleep(1)
+        
+        for m in chat[last_idx:]:
+            if m[0] != login:
+                msg.append(put_markdown(f"`{m[0]}`: {m[1]}"))
+        
+        if len(chat) > MAX_MSG:
+            chat = chat[len(chat) // 2:]
+        
+        last_idx = len(chat)
+
+if __name__ == "__main__":
+    start_server(main, debug=True, port=8080, cdn=False)     
