@@ -1,7 +1,3 @@
-# Test test test
-# print('Привет, Плотва!')
-# print('И-го-го, Геральт!')
-# Test test test
 
 from pywebio import start_server
 from pywebio.input import *
