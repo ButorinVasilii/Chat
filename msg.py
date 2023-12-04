@@ -10,7 +10,8 @@ MAX_MSG = 500  # Ограничение для количества сообще
 
 async def main():
     global chat
-    
+    put_markdown('# Убийца телеграмма')
+
     msg = output()
     put_scrollable(msg, height=500, keep_bottom=True)
 
