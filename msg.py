@@ -6,7 +6,7 @@ from pywebio.session import *
 import asyncio
 chat = []  # Массив для хранения сообщений чата
 online_users = set()  # Задаем список онлайн пользователей
-MAX_MSG = 1000  # Ограничение для количества сообщений в чате
+MAX_MSG = 50  # Ограничение для количества сообщений в чате
 
 async def main():
     global chat
@@ -18,22 +18,22 @@ async def main():
     login = await input("Войти", required=True)
     online_users.add(login)
 
-    chat.append(('', f'`{login}` вошёл(а) в чат'))
+    chat.append(('>>', f'`{login}` вошёл(а) в чат'))
     msg.append(put_markdown(f'`{login}` войшёл(а) в чат'))
 
     refresh_task = run_async(refresh_msg(login, msg))
 
     while True:
         data = await input_group('Новое сообщение', [
-            input(placeholder='Текст ...', name="msg"),
+            input(placeholder='Текст ...', name="rep"),
             actions(name="cmd", buttons=["Отправить", {'label': "Выйти из чата", 'type': 'cancel'}])
-        ], validate = lambda m: ('msg', 'Введите') if m["cmd"] == "Отправить" and not m['msg'] else None)
+        ], validate = lambda m: ('rep', 'Введите') if m["cmd"] == "Отправить" and not m['rep'] else None)
 
         if data is None:
             break
 
-        msg.append(put_markdown(f"`{login}`: {data['msg']}"))
-        chat.append((login, data['msg']))
+        msg.append(put_markdown(f"`{login}`: {data['rep']}"))
+        chat.append((login, data['rep']))
 
     refresh_task.close()
 
