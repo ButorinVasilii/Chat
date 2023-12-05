@@ -6,7 +6,7 @@ from pywebio.session import *
 import asyncio
 chat = []  # Массив для хранения сообщений чата
 online_users = set()  # Задаем список онлайн пользователей
-MAX_MSG = 500  # Ограничение для количества сообщений в чате
+MAX_MSG = 1000  # Ограничение для количества сообщений в чате
 
 async def main():
     global chat
@@ -18,8 +18,8 @@ async def main():
     login = await input("Войти", required=True)
     online_users.add(login)
 
-    chat.append(( f'`{login}` войти в чат'))
-    msg.append(put_markdown(f'`{login}` войти в чат'))
+    chat.append(('', f'`{login}` вошёл(а) в чат'))
+    msg.append(put_markdown(f'`{login}` войшёл(а) в чат'))
 
     refresh_task = run_async(refresh_msg(login, msg))
 
@@ -52,7 +52,7 @@ async def refresh_msg(login, msg):
         await asyncio.sleep(1)
         
         for m in chat[last_idx:]:
-            if m[0] != login:
+            if m[0] != login: 
                 msg.append(put_markdown(f"`{m[0]}`: {m[1]}"))
         
         if len(chat) > MAX_MSG:
