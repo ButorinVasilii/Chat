@@ -42,7 +42,7 @@ async def main():
     msg.append(put_markdown(f'`{login}` вышел'))
     chat.append(( f'`{login}`вышел'))
 
-    put_buttons(['Зайти с нова'], onclick=lambda btn:run_js('window.location.reload()'))
+    put_buttons(['Зайти снова'], onclick=lambda btn:run_js('window.location.reload()'))
 
 async def refresh_msg(login, msg):
     global chat
